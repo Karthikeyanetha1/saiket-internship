@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - User Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a1628, #1a2942, #0f1d3d);
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(192, 192, 192, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(192, 192, 192, 0.03) 0%, transparent 50%);
+            animation: float 15s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-10px, -10px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(26, 41, 66, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 20px;
+            padding: 25px 35px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.6s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: rgba(192, 192, 192, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+            margin-right: 15px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #c0c0c0;
+            font-size: 1rem;
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: rgba(192, 192, 192, 0.6);
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+            color: #0a1628;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            color: #ff6b81;
+            padding: 10px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 71, 87, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(26, 41, 66, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.05) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(192, 192, 192, 0.4);
+            box-shadow: 0 10px 30px rgba(192, 192, 192, 0.2);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.3));
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: rgba(192, 192, 192, 0.7);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+        }
+
+        .panel {
+            background: rgba(26, 41, 66, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(192, 192, 192, 0.9);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(10, 22, 40, 0.6);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #c0c0c0;
+            background: rgba(10, 22, 40, 0.8);
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+            border: none;
+            border-radius: 10px;
+            color: #0a1628;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(192, 192, 192, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(192, 192, 192, 0.2);
+            border: 1px solid rgba(192, 192, 192, 0.3);
+            color: #c0c0c0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b81, #ff4757);
+            color: white;
+        }
+
+        /* Users List */
+        .users-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .users-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .users-list::-webkit-scrollbar-track {
+            background: rgba(10, 22, 40, 0.3);
+            border-radius: 10px;
+        }
+
+        .users-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #c0c0c0, #a8a8a8);
+            border-radius: 10px;
+        }
+
+        .user-card {
+            background: rgba(10, 22, 40, 0.5);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-card:hover {
+            border-color: rgba(192, 192, 192, 0.4);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(192, 192, 192, 0.15);
+        }
+
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .user-card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #c0c0c0;
+        }
+
+        .user-card-username {
+            font-size: 0.85rem;
+            color: rgba(192, 192, 192, 0.6);
+            margin-top: 3px;
+        }
+
+        .user-card-email {
+            color: rgba(192, 192, 192, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .user-card-bio {
+            color: rgba(192, 192, 192, 0.6);
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .user-card-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: rgba(192, 192, 192, 0.6);
+            margin-bottom: 12px;
+        }
+
+        .user-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(46, 213, 115, 0.15);
+            border-color: #2ed573;
+            color: #7bed9f;
+        }
+
+        .alert-error {
+            background: rgba(255, 71, 87, 0.15);
+            border-color: #ff4757;
+            color: #ff6b81;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(26, 41, 66, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 192, 192, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: rgba(192, 192, 192, 0.7);
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close:hover {
+            color: #ff4757;
+            transform: rotate(90deg);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(192, 192, 192, 0.6);
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(192, 192, 192, 0.2);
+            border-top: 3px solid #c0c0c0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header-right {
+                flex-direction: column;
+            }
+
+            .user-info {
+                text-align: center;
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>🎯 User Management Dashboard</h1>
+                <p>SaiKet Systems - Task 6: Full Stack Application</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-name" id="currentUserName">
+                        Loading...
+                        <span class="admin-badge" id="adminBadge" style="display: none;">ADMIN</span>
+                    </div>
+                    <div class="user-role" id="currentUserEmail">Loading...</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats (Admin Only) -->
+        <div id="statsSection" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👑</div>
+                    <div class="stat-number" id="totalAdmins">0</div>
+                    <div class="stat-label">Administrators</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="activeUsers">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-number" id="averageAge">0</div>
+                    <div class="stat-label">Average Age</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- My Profile Panel -->
+            <div class="panel">
+                <h2>👤 My Profile</h2>
+                <div id="profileAlertContainer"></div>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="profileUsername" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profileFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profileEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="profileAge" min="1" max="150">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="profileBio"></textarea>
+                    </div>
+                    <button type="submit" class="btn">💾 Update Profile</button>
+                    <button type="button" class="btn btn-secondary" onclick="openPasswordModal()">🔑 Change Password</button>
+                    <button type="button" class="btn btn-danger" onclick="openDeleteModal()">🗑️ Delete Account</button>
+                </form>
+            </div>
+
+            <!-- Users List Panel (Admin Only) / My Info (Regular User) -->
+            <div class="panel">
+                <h2 id="rightPanelTitle">👥 All Users</h2>
+                <div id="usersListContainer">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🔑 Change Password</h3>
+                <button class="btn-close" onclick="closePasswordModal()">×</button>
+            </div>
+            <div id="passwordAlertContainer"></div>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn">Change Password</button>
+                <button type="button" class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">⚠️ Delete Account</h3>
+                <button class="btn-close" onclick="closeDeleteModal()">×</button>
+            </div>
+            <div id="deleteAlertContainer"></div>
+            <p style="color: rgba(192, 192, 192, 0.7); margin-bottom: 20px;">
+                This action cannot be undone. Please enter your password to confirm account deletion.
+            </p>
+            <form id="deleteForm">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="deletePassword" required>
+                </div>
+                <button type="submit" class="btn btn-danger">Delete Account</button>
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        let currentUser = null;
+        let authToken = null;
+// Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            authToken = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+
+            if (!authToken || !userStr) {
+                window.location.href = '/';
+                return;
+            }
+
+            currentUser = JSON.parse(userStr);
+            await loadUserProfile();
+
+            if (currentUser.role === 'admin') {
+                document.getElementById('statsSection').style.display = 'block';
+                await loadStats();
+                await loadAllUsers();
+            } else {
+                document.getElementById('rightPanelTitle').textContent = '📝 Account Information';
+                showUserInfo();
+            }
+        });
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const user = data.data;
+                    currentUser = user;
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    // Update header
+                    document.getElementById('currentUserName').innerHTML = user.full_name;
+                    if (user.role === 'admin') {
+                        document.getElementById('adminBadge').style.display = 'inline-block';
+                    }
+                    document.getElementById('currentUserEmail').textContent = user.email;
+
+                    // Update form
+                    document.getElementById('profileUsername').value = user.username;
+                    document.getElementById('profileFullName').value = user.full_name;
+                    document.getElementById('profileEmail').value = user.email;
+                    document.getElementById('profileAge').value = user.age || '';
+                    document.getElementById('profileBio').value = user.bio || '';
+                } else {
+                    if (response.status === 401) {
+                        logout();
+                    }
+                }
+            } catch (error) {
+                console.error('Load profile error:', error);
+            }
+        }
+
+        // Update profile
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userData = {
+                full_name: document.getElementById('profileFullName').value,
+                email: document.getElementById('profileEmail').value,
+                age: document.getElementById('profileAge').value ? parseInt(document.getElementById('profileAge').value) : null,
+                bio: document.getElementById('profileBio').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('profileAlertContainer', '✅ Profile updated successfully!', 'success');
+                    await loadUserProfile();
+                } else {
+                    showAlert('profileAlertContainer', '❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('profileAlertContainer', '❌ Connection error', 'error');
+            }
+        });
+
+        // Change password
+        function openPasswordModal() {
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('passwordForm').reset();
+            document.getElementById('passwordAlertContainer').innerHTML = '';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const passwordData = {
+                currentPassword: document.getElementById('currentPassword').value,
+                newPassword: document.getElementById('newPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/users/me/password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(passwordData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('passwordAlertContainer', '✅ Password changed successfully!', 'success');
+                    setTimeout(() => {
+                        closePasswordModal();
+                    }, 2000);
+                } else {
+                    showAlert('passwordAlertContainer', '❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('passwordAlertContainer', '❌ Connection error', 'error');
+            }
+        });
+
+        // Delete account
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.add('active');
+            document.getElementById('deleteForm').reset();
+            document.getElementById('deleteAlertContainer').innerHTML = '';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        document.getElementById('deleteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const password = document.getElementById('deletePassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('deleteAlertContainer', '✅ Account deleted successfully', 'success');
+                    setTimeout(() => {
+                        logout();
+                    }, 1500);
+                } else {
+                    showAlert('deleteAlertContainer', '❌ ' + data.error, 'error');
+                }
+            } catch (error) {
+                showAlert('deleteAlertContainer', '❌ Connection error', 'error');
+            }
+        });
+
+        // Load statistics (Admin)
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.stats.totalUsers;
+                    document.getElementById('totalAdmins').textContent = data.stats.totalAdmins;
+                    document.getElementById('activeUsers').textContent = data.stats.activeUsers;
+                    document.getElementById('averageAge').textContent = data.stats.averageAge || 0;
+                }
+            } catch (error) {
+                console.error('Load stats error:', error);
+            }
+        }
+
+        // Load all users (Admin)
+        async function loadAllUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayUsers(data.data);
+                }
+            } catch (error) {
+                console.error('Load users error:', error);
+            }
+        }
+
+        // Display users list
+        function displayUsers(users) {
+            const container = document.getElementById('usersListContainer');
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <p>No users found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="users-list">
+                    ${users.map(user => `
+                        <div class="user-card">
+                            <div class="user-card-header">
+                                <div>
+                                    <div class="user-card-name">${user.full_name}</div>
+                                    <div class="user-card-username">@${user.username}</div>
+                                </div>
+                                ${user.role === 'admin' ? '<span class="admin-badge">ADMIN</span>' : ''}
+                            </div>
+                            <div class="user-card-email">📧 ${user.email}</div>
+                            ${user.bio ? `<div class="user-card-bio">"${user.bio}"</div>` : ''}
+                            <div class="user-card-meta">
+                                <span>👤 Age: ${user.age || 'N/A'}</span>
+                                <span>📅 Joined: ${new Date(user.created_at).toLocaleDateString()}</span>
+                                <span>${user.is_active ? '✅ Active' : '❌ Inactive'}</span>
+                            </div>
+                            ${user.id !== currentUser.id ? `
+                                <div class="user-card-actions">
+                                    <button class="btn btn-small" onclick="viewUser(${user.id})">👁️ View</button>
+                                    <button class="btn btn-small btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">🗑️ Delete</button>
+                                </div>
+                            ` : '<div style="color: rgba(192,192,192,0.6); font-size: 0.85rem;">This is you</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Show user info for regular users
+        function showUserInfo() {
+            const container = document.getElementById('usersListContainer');
+            container.innerHTML = `
+                <div style="padding: 20px;">
+                    <div class="user-card">
+                        <h3 style="color: #c0c0c0; margin-bottom: 15px;">Your Account Details</h3>
+                        <div style="color: rgba(192,192,192,0.8); line-height: 1.8;">
+                            <p><strong>Username:</strong> ${currentUser.username}</p>
+                            <p><strong>Email:</strong> ${currentUser.email}</p>
+                            <p><strong>Full Name:</strong> ${currentUser.full_name}</p>
+                            <p><strong>Age:</strong> ${currentUser.age || 'Not set'}</p>
+                            ${currentUser.bio ? `<p><strong>Bio:</strong> ${currentUser.bio}</p>` : ''}
+                            <p><strong>Role:</strong> ${currentUser.role}</p>
+                            <p><strong>Account Status:</strong> ${currentUser.is_active ? '✅ Active' : '❌ Inactive'}</p>
+                            <p><strong>Member Since:</strong> ${new Date(currentUser.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 20px; background: rgba(192,192,192,0.1); border-radius: 12px; border: 1px solid rgba(192,192,192,0.2);">
+                        <h4 style="color: #c0c0c0; margin-bottom: 10px;">💡 Quick Tips</h4>
+                        <ul style="color: rgba(192,192,192,0.7); line-height: 1.8; list-style-position: inside;">
+                            <li>Update your profile information anytime</li>
+                            <li>Change your password regularly for security</li>
+                            <li>Add a bio to personalize your profile</li>
+                            <li>Keep your email up to date</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // View user details (Admin)
+        async function viewUser(userId) {
+            try {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const user = data.data;
+                    alert(`
+User Details:
+━━━━━━━━━━━━━━━━━━━━
+Username: ${user.username}
+Full Name: ${user.full_name}
+Email: ${user.email}
+Age: ${user.age || 'N/A'}
+Bio: ${user.bio || 'No bio'}
+Role: ${user.role}
+Status: ${user.is_active ? 'Active' : 'Inactive'}
+Joined: ${new Date(user.created_at).toLocaleString()}
+                    `);
+                }
+            } catch (error) {
+                alert('Error loading user details');
+            }
+        }
+
+        // Delete user (Admin)
+        async function deleteUser(userId, username) {
+            if (!confirm(`Are you sure you want to delete user "${username}"?\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ User deleted successfully!');
+                    await loadAllUsers();
+                    await loadStats();
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Connection error');
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Show alert
+        function showAlert(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
