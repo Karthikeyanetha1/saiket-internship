@@ -39,6 +39,6 @@ A fully responsive e-commerce landing page built with HTML, CSS, Bootstrap, and 
 2. Or use a local server (see below)
 
 ### Created By
-[Your Name]
+Karthikeya Gurram 
 SaiKet Systems Internship Program
 Task 2 - January 2026
